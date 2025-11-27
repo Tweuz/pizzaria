@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DuCheff Pizzaria Express - Pizzas deliciosas em Lago Norte, Brasília. Entrega rápida e combos promocionais.">
+  <title>DuCheff Pizzaria Express - Pizzas Deliciosas</title>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Ajustes de layout do carrinho -->
+  <style>
+    /* Modal do carrinho centralizado */
+    #cartModal.cart-modal {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* Só aparece quando tiver .active */
+    #cartModal.cart-modal.active {
+      display: flex !important;
+    }
+
+    /* Painel do carrinho no desktop */
+    #cartModal .cart-content {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      max-height: 95vh;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    /* Celular: ocupa a tela inteira */
+    @media (max-width: 768px) {
+      #cartModal .cart-content {
+        max-width: 100%;
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Cabeçalho e Navegação -->
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <h1>DuCheff</h1>
+        <p class="tagline">Pizzaria Express</p>
+      </div>
+      <nav class="navbar">
+        <ul>
+          <li><a href="#home">Início</a></li>
+          <li><a href="#cardapio">Cardápio</a></li>
+          <li><a href="#promocoes">Promoções</a></li>
+          <li><a href="#contato">Contato</a></li>
+        </ul>
+      </nav>
+      <button class="cart-btn" onclick="toggleCart()">
+        Carrinho
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Modal do Carrinho -->
+  <div id="cartModal" class="cart-modal">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h2>Seu Pedido</h2>
+        <button class="close-btn" onclick="toggleCart()">×</button>
+      </div>
+
+      <div class="cart-items" id="cartItems">
+        <p class="empty-cart">Seu carrinho está vazio</p>
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-total">
+          <strong>Total:</strong>
+          <span id="cartTotal">R$ 0,00</span>
+        </div>
+
+        <label for="orderNote">Observação</label>
+        <textarea id="orderNote" class="cart-input" rows="2" placeholder="Ex.: tirar cebola, ponto da massa, troco, etc."></textarea>
+
+        <input type="text" id="customerName" placeholder="Seu nome" class="cart-input">
+        <input type="text" id="customerPhone" placeholder="Seu telefone" class="cart-input">
+
+        <div class="delivery-options">
+          <label>Tipo de Entrega</label>
+          <div class="delivery-buttons">
+            <button id="deliveryEntrega" class="delivery-btn active" onclick="setDeliveryType('entrega')">Entrega</button>
+            <button id="deliveryRetirada" class="delivery-btn" onclick="setDeliveryType('retirada')">Retirada no Local</button>
+          </div>
+        </div>
+
+        <input type="text" id="customerAddress" placeholder="Seu endereço" class="cart-input">
+
+        <div class="payment-options">
+          <label>Forma de Pagamento</label>
+          <div class="payment-buttons">
+            <button id="paymentEntrega" class="payment-btn active" onclick="setPaymentMethod('entrega')">Pagamento na Entrega</button>
+            <button id="paymentPix" class="payment-btn" onclick="setPaymentMethod('pix')">PIX</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="sendToWhatsApp()" style="width: 100%; margin-top: 15px;">
+          Enviar Pedido via WhatsApp
+        </button>
+        <button class="btn btn-secondary" onclick="toggleCart()" style="width: 100%; margin-top: 10px;">
+          Continuar Comprando
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Contato Rápido -->
+  <div class="quick-contact" id="home">
+    <div class="container">
+      <div class="quick-contact-content">
+        <span class="contact-label">Entre em contato</span>
+        <a href="tel:3468-4000" class="quick-link phone">3468.4000</a>
+        <a href="https://wa.me/5561998785692" target="_blank" class="quick-link whatsapp">61 99878.5692</a>
+        <a href="https://www.ifood.com.br/delivery/brasilia-df/du-cheff---lago-norte-qi-2-2a/55c64-c12e-4990-a737-d52120cccae5?UTMMedium=share" target="_blank" class="quick-link ifood">iFood</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h2>Pizzas Incríveis Entregues na Sua Porta</h2>
+      <p>Sabor autêntico, qualidade premium e promoções irresistíveis</p>
+      <button class="btn btn-primary" onclick="scrollToSection('cardapio')">Ver Cardápio</button>
+    </div>
+  </section>
+
+  <!-- Seção de Destaques -->
+  <section class="highlights">
+    <div class="container">
+      <div class="highlight-card">
+        <div class="icon"></div>
+        <h3>Pizzas Saborosas</h3>
+        <p>54 sabores deliciosos feitos com ingredientes frescos e de qualidade</p>
+      </div>
+      <div class="highlight-card">
+        <div class="icon"></div>
+        <h3>Feito com Carinho</h3>
+        <p>Cada pizza preparada com dedicação e atenção aos detalhes</p>
+      </div>
+      <div class="highlight-card">
+        <div class="icon"></div>
+        <h3>Combos Especiais</h3>
+        <p>Promoções incríveis para você aproveitar com amigos e família</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção de Cardápio -->
+  <section id="cardapio" class="cardapio">
+    <div class="container">
+      <h2>Nosso Cardápio</h2>
+
+      <!-- Filtros -->
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="todas">Todas</button>
+        <button class="filter-btn" data-filter="tradicionais">Tradicionais</button>
+        <button class="filter-btn" data-filter="especiais">Especiais</button>
+        <button class="filter-btn" data-filter="premium">Premium</button>
+      </div>
+
+      <!-- Grade de Pizzas -->
+      <div class="pizzas-grid" id="pizzasGrid">
+        <!-- Pizzas via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção de Promoções -->
+  <section id="promocoes" class="promocoes">
+    <div class="container">
+      <h2>Promoções Especiais</h2>
+
+      <div class="promo-grid">
+        <div class="promo-card">
+          <div class="promo-badge">PROMOÇÃO DO DIA</div>
+          <h3>Pizza Grande</h3>
+          <p class="promo-price">R$ 30,00</p>
+          <p class="promo-desc" id="promoDayText">Carregando sabores do dia...</p>
+          <div id="promoDayFlavors" class="promo-flavors"></div>
+        </div>
+
+        <div class="promo-card">
+          <div class="promo-badge">TERÇA EM DOBRO</div>
+          <h3>Premium Tradicional</h3>
+          <p class="promo-price">R$ 56,00</p>
+          <p class="promo-desc">Válido apenas às terças-feiras</p>
+          <button class="promo-flavor-btn" onclick="openTuesdayDoubleModal()" style="width: 100%; margin-top: 15px;">Adicionar</button>
+        </div>
+      </div>
+
+      <h3 class="combos-title">Combos Promocionais</h3>
+      <div class="combos-grid" id="combosGrid"></div>
+    </div>
+  </section>
+
+  <!-- Seção de Contato -->
+  <section id="contato" class="contato">
+    <div class="container">
+      <h2>Entre em Contato</h2>
+
+      <div class="contato-grid">
+        <div class="contato-card">
+          <h3>Telefone</h3>
+          <p><a href="tel:3468-4000">3468.4000</a></p>
+        </div>
+        <div class="contato-card">
+          <h3>WhatsApp</h3>
+          <p><a href="https://wa.me/5561998785692" target="_blank">61 99878.5692</a></p>
+        </div>
+        <div class="contato-card">
+          <h3>iFood</h3>
+          <p><a href="https://www.ifood.com.br/delivery/brasilia-df/du-cheff---lago-norte-qi-2-2a/55c64-c12e-4990-a737-d52120cccae5?UTMMedium=share" target="_blank">Peça pelo iFood</a></p>
+        </div>
+        <div class="contato-card">
+          <h3>Horário</h3>
+          <p>Todos os dias<br>16:00 às 23:30</p>
+        </div>
+      </div>
+
+      <div class="contato-info">
+        <p>Aceitamos <strong>Visa, Mastercard, Maestro, Elo</strong></p>
+        <p><strong>Localização:</strong> SHIN QI 2, Área Especial, loja 5 - Anexo ao Pão de Açúcar, Lago Norte-DF</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de Meio a Meio -->
+  <div id="halfPizzaModal" class="half-pizza-modal">
+    <div class="half-pizza-modal-content">
+      <div class="half-pizza-modal-header">
+        <h2>Escolha a Configuração da Pizza</h2>
+        <button class="close-btn" onclick="closeHalfPizzaModal()">×</button>
+      </div>
+      <div class="half-pizza-modal-body">
+        <p id="halfPizzaModalTitle" style="font-weight: bold; margin-bottom: 15px;"></p>
+        <div class="half-pizza-options">
+          <button class="half-pizza-option active" onclick="selectHalfPizzaOption('inteira')">
+            <span class="option-icon">🍕</span>
+            <span class="option-text">Pizza Inteira</span>
+            <span class="option-desc">Um sabor único em toda a pizza</span>
+          </button>
+          <button class="half-pizza-option" onclick="selectHalfPizzaOption('meia')">
+            <span class="option-icon">🧀</span>
+            <span class="option-text">Meio a Meio</span>
+            <span class="option-desc">Dois sabores na mesma pizza</span>
+          </button>
+        </div>
+        <div id="halfPizzaFlavorSelect" style="display: none; margin-top: 20px;">
+          <label style="display: block; margin-bottom: 10px; font-weight: bold;">Escolha o segundo sabor</label>
+          <div class="half-pizza-flavor-list" id="halfPizzaFlavorList"></div>
+        </div>
+      </div>
+      <div class="half-pizza-modal-footer">
+        <button class="btn btn-secondary" onclick="closeHalfPizzaModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmHalfPizza()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 DuCheff Pizzaria Express. Todos os direitos reservados.</p>
+      <p>Desenvolvido com ❤ para os amantes de pizza</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/menu.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/combos.js"></script>
+  <script src="js/halfpizza-modal.js"></script>
+  <script src="js/daily-promo.js"></script>
+  <script src="js/tuesday-double.js"></script>
+</body>
+</html>
